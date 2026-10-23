@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}DSA Lab{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+  <span class="eyebrow">LEARN BY DOING</span>
+  <h1>Data Structures Lab</h1>
+  <p>Explore the concepts behind your coffee shop project.</p>
+  <a class="text-link" href="{{ url_for('admin_dashboard') }}">← Back to dashboard</a>
+</section>
+
+<section class="dsa-wrap">
+
+  <div class="dsa-tabs">
+    <a class="active" href="#phase1">Phase 1 · Linear</a>
+    <a href="#phase2">Phase 2 · Trees & Graphs</a>
+    <a href="#phase3">Phase 3 · Search & Sort</a>
+    <a href="#phase4">Phase 4 · Greedy</a>
+  </div>
+
+  <!-- ================= PHASE I ================= -->
+  <article class="dsa-card" id="phase1">
+    <span class="eyebrow">PHASE I</span>
+    <h2>Linear data structures</h2>
+
+    <div class="dsa-columns">
+      <div>
+        <h3>Linked list — current coffee menu</h3>
+        <p>Each coffee is treated as a node connected to the next node.</p>
+
+        <div class="linked-visual">
+          {% for coffee in coffees %}
+            <span>{{ coffee['coffee_name'] }}</span>
+            {% if not loop.last %}<b>→</b>{% endif %}
+          {% endfor %}
+          <b>→ NULL</b>
+        </div>
+
+        <p class="code-output">{{ linked }}</p>
+      </div>
+
+      <div>
+        <h3>Stack & queue</h3>
+        <p><b>Stack (LIFO):</b> the last item pushed is the first item popped.</p>
+
+        <div class="stack-visual">
+          <span>Top → Pop</span>
+          <b>Mocha</b>
+          <b>Latte</b>
+          <b>Espresso</b>
+          <span>Bottom</span>
+        </div>
+
+        <p><b>Queue (FIFO):</b> the first order received is the first processed.</p>
+
+        <div class="queue-visual">
+          <span>Front →</span>
+          <b>Order 101</b>
+          <b>Order 102</b>
+          <b>Order 103</b>
+          <span>→ Rear</span>
+        </div>
+
+        <p class="muted small">These are visual examples; the linked-list display is built from the current menu records.</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- ================= PHASE II ================= -->
+  <article class="dsa-card" id="phase2">
+    <span class="eyebrow">PHASE II</span>
+    <h2>Hierarchical and graph structures</h2>
+
+    <div class="dsa-columns">
+      <div>
+        <h3>BST price traversals</h3>
+        <p>Prices are inserted into a binary search tree. Each traversal visits nodes in a different order.</p>
+
+        {% for name, values in traversals.items() %}
+          <div class="traversal-row">
+            <b>{{ name }}</b>
+            <span>{{ values|join(' → ') if values else 'No values' }}</span>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div>
+        <h3>Graph — BFS category walk</h3>
+        <p>Breadth-First Search visits connected nodes level by level using a queue.</p>
+
+        <div class="graph-visual">
+          <span class="graph-node">Hot Coffee</span>
+          <i>↓ BFS</i>
+          <span class="graph-node">Espresso · Cappuccino · Latte · Americano</span>
+          <span class="graph-node">Specials · Cold Coffee</span>
+        </div>
+
+        <p class="code-output">BFS traversal: {{ bfs|join(' → ') }}</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- ================= PHASE III ================= -->
+  <article class="dsa-card" id="phase3">
+    <span class="eyebrow">PHASE III</span>
+    <h2>Searching and sorting</h2>
+
+    <div class="dsa-columns">
+      <div>
+        <h3>Linear search</h3>
+        <p>Checks each menu record in sequence. Works even when records are not sorted.</p>
+        <span class="complexity">Worst case: O(n)</span>
+      </div>
+
+      <div>
+        <h3>Binary search</h3>
+        <p>Searches a sorted list by repeatedly halving the search range.</p>
+        <span class="complexity">Typical case: O(log n)</span>
+      </div>
+    </div>
+
+    <h3>Insertion sort — current prices, low to high</h3>
+
+    <div class="price-chips">
+      {% for price in prices %}
+        <span>₹{{ '%.0f'|format(price) }}</span>
+      {% endfor %}
+    </div>
+
+    <p class="muted small">Sorted price sequence shown for demonstration. Insertion sort worst-case time complexity is O(n²).</p>
+  </article>
+
+  <!-- ================= PHASE IV ================= -->
+  <article class="dsa-card greedy-card" id="phase4">
+    <span class="eyebrow">PHASE IV · SELECTED TECHNIQUE</span>
+    <h2>Greedy coupon selection</h2>
+
+    <p>The Greedy rule chooses the eligible offer that gives the largest immediate discount for a ₹{{ sample_total }} sample cart.</p>
+
+    {% if best %}
+      <div class="greedy-result">
+        <span class="offer-stamp">{{ best['discount'] }}<small>% OFF</small></span>
+
+        <div>
+          <span class="eyebrow">BEST ELIGIBLE COUPON</span>
+          <h3>{{ best['coupon_code'] }} · {{ best['title'] }}</h3>
+          <p>Discount: ₹{{ '%.2f'|format(sample_total * best['discount'] / 100) }}</p>
+          <b>Payable after discount: ₹{{ '%.2f'|format(sample_total - (sample_total * best['discount'] / 100)) }}</b>
+        </div>
+      </div>
+    {% else %}
+      <p>No offer is eligible for this sample cart.</p>
+    {% endif %}
+
+    <p class="muted small">The application checks minimum-cart eligibility before comparing coupon discounts. This example is based on the offers configured in the database.</p>
+  </article>
+
+</section>
+{% endblock %}

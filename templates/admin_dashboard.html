@@ -1,0 +1,564 @@
+```html
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+
+<section class="admin-shell">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="admin-sidebar">
+
+        <div class="admin-brand">
+            ♨
+            <span>
+                Brew & Bliss
+                <small>ADMIN STUDIO</small>
+            </span>
+        </div>
+
+        <a class="selected" href="#overview">
+            ▦ &nbsp; Dashboard
+        </a>
+
+        <a href="#manage-coffee">
+            ☕ &nbsp; Manage coffees
+        </a>
+
+        <a href="#orders">
+            ▤ &nbsp; Orders
+        </a>
+
+        <a href="{{ url_for('dsa') }}">
+            ⌘ &nbsp; DSA Lab
+        </a>
+
+        <a href="{{ url_for('logout') }}">
+            ↪ &nbsp; Logout
+        </a>
+
+        <div class="sidebar-note">
+            A good cup starts with good care.
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <div class="admin-main">
+
+        <!-- Welcome Section -->
+        <section class="admin-welcome" id="overview">
+
+            <div>
+                <span class="eyebrow">
+                    YOUR COFFEE SHOP AT A GLANCE
+                </span>
+
+                <h1>Welcome, Admin!</h1>
+
+                <p>
+                    Here's what's happening with your shop today.
+                </p>
+            </div>
+
+            <div class="admin-cup">
+                ☕
+            </div>
+
+        </section>
+
+
+        <!-- ================= STATISTICS ================= -->
+        <div class="stats-grid">
+
+            <article class="stat-card">
+                <span>☕</span>
+                <small>Total coffees</small>
+                <b>{{ counts.coffees }}</b>
+                <em>Menu items</em>
+            </article>
+
+            <article class="stat-card">
+                <span>▤</span>
+                <small>Total orders</small>
+                <b>{{ counts.orders }}</b>
+                <em>Orders received</em>
+            </article>
+
+            <article class="stat-card">
+                <span>♙</span>
+                <small>Total customers</small>
+                <b>{{ counts.customers }}</b>
+                <em>Registered accounts</em>
+            </article>
+
+        </div>
+
+
+        <!-- ================= MANAGE COFFEES ================= -->
+        <section class="admin-panel" id="manage-coffee">
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="eyebrow">
+                        MENU MANAGEMENT
+                    </span>
+
+                    <h2>Manage coffees</h2>
+                </div>
+
+                <span class="tag">
+                    ADMIN CONTROL
+                </span>
+
+            </div>
+
+
+            <!-- Add Coffee Form -->
+            <form
+                class="admin-form"
+                method="post"
+                action="{{ url_for('save_coffee') }}"
+            >
+
+                <input
+                    type="text"
+                    name="coffee_name"
+                    placeholder="Coffee name"
+                    required
+                >
+
+                <input
+                    type="text"
+                    name="category"
+                    placeholder="Category"
+                    value="Specials"
+                    required
+                >
+
+                <input
+                    type="number"
+                    name="price"
+                    min="1"
+                    step="1"
+                    placeholder="Price ₹"
+                    required
+                >
+
+                <input
+                    type="number"
+                    name="quantity"
+                    min="0"
+                    placeholder="Stock"
+                    required
+                >
+
+                <input
+                    type="text"
+                    name="emoji"
+                    placeholder="Emoji"
+                    value="☕"
+                    maxlength="8"
+                >
+
+                <input
+                    type="text"
+                    name="description"
+                    placeholder="Short description"
+                >
+
+                <button
+                    class="btn btn-caramel"
+                    type="submit"
+                >
+                    ＋ Add coffee
+                </button>
+
+            </form>
+
+
+            <!-- Coffee Table -->
+            <div class="admin-table-wrap">
+
+                <table class="admin-table">
+
+                    <thead>
+                        <tr>
+                            <th>Coffee</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for coffee in coffees %}
+
+                        <tr>
+
+                            <td>
+                                <b>
+                                    {{ coffee['emoji'] }}
+                                    {{ coffee['coffee_name'] }}
+                                </b>
+                            </td>
+
+                            <td>
+                                {{ coffee['category'] }}
+                            </td>
+
+                            <td>
+                                ₹{{ '%.0f'|format(coffee['price']) }}
+                            </td>
+
+                            <td>
+                                {{ coffee['quantity'] }}
+                            </td>
+
+                            <td>
+
+                                <button
+                                    type="button"
+                                    class="tiny-btn edit-coffee"
+                                    data-id="{{ coffee['coffee_id'] }}"
+                                    data-name="{{ coffee['coffee_name'] }}"
+                                    data-category="{{ coffee['category'] }}"
+                                    data-price="{{ coffee['price'] }}"
+                                    data-stock="{{ coffee['quantity'] }}"
+                                    data-emoji="{{ coffee['emoji'] }}"
+                                    data-description="{{ coffee['description'] }}"
+                                >
+                                    Edit
+                                </button>
+
+
+                                <form
+                                    class="inline-form"
+                                    method="post"
+                                    action="{{ url_for(
+                                        'delete_coffee',
+                                        coffee_id=coffee['coffee_id']
+                                    ) }}"
+                                    onsubmit="return confirm(
+                                        'Remove this coffee from the menu?'
+                                    )"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="tiny-btn danger"
+                                    >
+                                        Delete
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+                            <td colspan="5">
+                                No coffees available. Add your first coffee above.
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <p class="muted small">
+                To edit an item, click Edit. Its values will load
+                into the form above.
+            </p>
+
+        </section>
+
+
+        <!-- ================= RECENT ORDERS ================= -->
+        <section class="admin-panel" id="orders">
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="eyebrow">
+                        KEEP EVERY CUP MOVING
+                    </span>
+
+                    <h2>Recent orders</h2>
+                </div>
+
+            </div>
+
+
+            <div class="admin-table-wrap">
+
+                <table class="admin-table">
+
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Customer</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Update</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for order in orders %}
+
+                        <tr>
+
+                            <td>
+                                #{{ order['order_id'] }}
+
+                                <small class="table-sub">
+                                    {{ order['created_at'] }}
+                                </small>
+                            </td>
+
+                            <td>
+                                {{ order['username'] }}
+                            </td>
+
+                            <td>
+                                ₹{{ '%.2f'|format(order['total_amount']) }}
+                            </td>
+
+                            <td>
+                                <span class="status status-{{ order['status']|lower }}">
+                                    {{ order['status'] }}
+                                </span>
+                            </td>
+
+                            <td>
+
+                                <form
+                                    class="status-form"
+                                    method="post"
+                                    action="{{ url_for(
+                                        'order_status',
+                                        order_id=order['order_id']
+                                    ) }}"
+                                >
+
+                                    <select name="status">
+
+                                        <option
+                                            {{ 'selected' if order['status'] == 'Pending' }}
+                                        >
+                                            Pending
+                                        </option>
+
+                                        <option
+                                            {{ 'selected' if order['status'] == 'Preparing' }}
+                                        >
+                                            Preparing
+                                        </option>
+
+                                        <option
+                                            {{ 'selected' if order['status'] == 'Ready' }}
+                                        >
+                                            Ready
+                                        </option>
+
+                                        <option
+                                            {{ 'selected' if order['status'] == 'Completed' }}
+                                        >
+                                            Completed
+                                        </option>
+
+                                        <option
+                                            {{ 'selected' if order['status'] == 'Cancelled' }}
+                                        >
+                                            Cancelled
+                                        </option>
+
+                                    </select>
+
+                                    <button
+                                        type="submit"
+                                        class="tiny-btn"
+                                    >
+                                        Save
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+                            <td colspan="5">
+                                No orders yet. They'll appear here after checkout.
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= BOTTOM LINKS ================= -->
+        <section class="admin-bottom">
+
+            <a href="{{ url_for('dsa') }}">
+                ⌘ Open the Data Structures Lab →
+            </a>
+
+            <span>
+                Manage with care. Brew with love.
+            </span>
+
+        </section>
+
+    </div>
+
+</section>
+
+
+<!-- ================= EDIT COFFEE DIALOG ================= -->
+<dialog id="edit-dialog" class="edit-dialog">
+
+    <form
+        method="post"
+        action="{{ url_for('save_coffee') }}"
+        class="form-stack"
+    >
+
+        <div class="section-heading">
+
+            <h2>Edit coffee</h2>
+
+            <button
+                type="button"
+                class="close-dialog"
+                onclick="document.getElementById('edit-dialog').close()"
+                aria-label="Close edit dialog"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <input
+            type="hidden"
+            name="coffee_id"
+            id="edit-id"
+        >
+
+
+        <label>
+            Coffee name
+
+            <input
+                type="text"
+                name="coffee_name"
+                id="edit-name"
+                required
+            >
+        </label>
+
+
+        <label>
+            Category
+
+            <input
+                type="text"
+                name="category"
+                id="edit-category"
+                required
+            >
+        </label>
+
+
+        <div class="form-row">
+
+            <label>
+                Price ₹
+
+                <input
+                    type="number"
+                    name="price"
+                    id="edit-price"
+                    min="1"
+                    step="1"
+                    required
+                >
+            </label>
+
+
+            <label>
+                Stock
+
+                <input
+                    type="number"
+                    name="quantity"
+                    id="edit-stock"
+                    min="0"
+                    required
+                >
+            </label>
+
+        </div>
+
+
+        <label>
+            Emoji
+
+            <input
+                type="text"
+                name="emoji"
+                id="edit-emoji"
+                maxlength="8"
+            >
+        </label>
+
+
+        <label>
+            Description
+
+            <input
+                type="text"
+                name="description"
+                id="edit-description"
+            >
+        </label>
+
+
+        <button
+            type="submit"
+            class="btn btn-caramel full"
+        >
+            Save changes
+        </button>
+
+    </form>
+
+</dialog>
+
+{% endblock %}
+```
